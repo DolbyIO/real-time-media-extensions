@@ -1,6 +1,9 @@
-name: Build on Ubuntu
-on: pull_request
-    
+name: Build Docker image on Ubuntu
+on:
+  push:
+    tags:
+    - '*'
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -11,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get --quiet update
-          sudo apt-get --quiet install python3-pkg-resources python3-pip ninja-build libcurl4-openssl-dev libssl-dev libpulse-dev
+          sudo apt-get --quiet install docker-ce-cli python3-pkg-resources python3-pip ninja-build libcurl4-openssl-dev libssl-dev libpulse-dev
           sudo apt purge cmake
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
           export DEBIAN_FRONTEND=noninteractive
@@ -24,4 +27,4 @@ jobs:
 
       - name: Build RTME c++/golang
         run: |
-          bash setup/internal/linux.sh 
+          sudo bash setup/internal/linux.sh --build_docker 
