@@ -1,0 +1,29 @@
+name: Build on Ubuntu
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pkg-resources python3-pip ninja-build libcurl4-openssl-dev libssl-dev
+
+      - name: Install golang
+        uses: actions/checkout@v3
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.2'
+
+      - name: Install cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '>=3.21.0'
+
+      - name: Build RTME c++/golang
+        run: |
+          bash setup/internal/linux.sh              

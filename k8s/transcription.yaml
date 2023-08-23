@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: transcription-pod
+spec:
+  containers:
+    - name: transcription-container
+      image: transcription:latest
+      ports:
+        - name: http
+          containerPort: 8080
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          value: ""
+        - name: AWS_SECRET_ACCESS_KEY
+          value: ""
+        - name: AWS_SESSION_TOKEN
+          value: ""
+        - name: AWS_S3_TRANSCRIPT_URI
+          value: ""
+        - name: CONFERENCE_TOKEN
+          value: ""
+        - name: CONFERENCE_ALIAS
+          value: ""
+        - name: USER_NAME
+          value: ""
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 10
+  terminationGracePeriodSeconds: 60
