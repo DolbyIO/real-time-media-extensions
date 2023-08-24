@@ -34,12 +34,12 @@ jobs:
           bash setup/internal/linux.sh 
        
       - name: Prepare docker resources for upload
-        if: false 
+        if: github.ref_type == 'tag'
         run: |
           zip -r docker-resource.zip build_docker_dir/
 
       - name: Upload docker resources
-        if: false
+        if: github.ref_type == 'tag'
         uses: actions/upload-artifact@v3
         with:
           name: docker-resource
@@ -47,8 +47,8 @@ jobs:
           retention-days: 1
  
   build-docker:
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-20.04
-    if: false 
     needs: build-resources
     steps:
       - name: Check out repository code
@@ -71,3 +71,29 @@ jobs:
           name: docker-rtme-image
           path: dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
           retention-days: 7
+
+  publish-docker:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-docker
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-rtme-image
