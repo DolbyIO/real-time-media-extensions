@@ -1,4 +1,4 @@
-name: Build on Ubuntu
+name: Build RTME 
 
 on:
   pull_request:

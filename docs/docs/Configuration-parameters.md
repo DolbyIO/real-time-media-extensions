@@ -6,8 +6,8 @@ id: configuration-parameters
 The following configuration parameters are essential for RTME applications. You can provide them to a container image and a Linux executable.
 
 ## General
-| Item       | Meaning                                                 | Linux executable argument | Container parameter | Possible values                       |
-|------------|---------------------------------------------------------|---------------------------|---------------------|---------------------------------------|
+| Item       | Meaning                                                 | Linux executable argument | Container parameter | Possible values                     |
+|------------|---------------------------------------------------------|---------------------------|---------------------|-------------------------------------|
 | **Plugin** | The full path to the application plugin, in .so format. | `-plugin`                 | N/A                 | `libdolbyio_comms_transcription.so` |
 
 
@@ -32,24 +32,24 @@ The following configuration parameters are essential for RTME applications. You 
 
 -->
 
-## Mechanism for sending RTME data
-Following the processing of real-time audio/video by the RTME application it may desireable for users to transfer this data somewhere outside of the docker container in real-time. The send mechansim is to be specified as queryparam to the /start REST endpoint. If not specified the RTME application will just store the data to a file. 
+## Mechanisms for sending RTME data
+RTME offers mechanisms for transferring data processed by the application outside of the docker container in real time. You can specify the preferred mechanism by providing the proper query parameter to the /start REST endpoint. When it is not specified, the RTME application stores data in a file.
 
 | Item                | Meaning                                                                                                      | QueryParam to /start REST endpoint | Possible Values   |
 |---------------------|--------------------------------------------------------------------------------------------------------------|------------------------------------|-------------------|
 | **Send Mechanism**  | The mechanism used to send data from outside the RTME application. Currently this can be `http` or `pubnub`. | sendmechanism                      | `http`, `pubnub`  |
 
 ### PubNub
-If Pubnub is used as the send mechansim the following credentials are needed. They can be found following [registering](https://admin.pubnub.com/#/register) with Pubnub and creating an account.
+Using PubNub as the send mechanism requires PubNub credentials that you can access after [registering](https://admin.pubnub.com/#/register) a PubNub account.
 | Item                | Meaning                          | QueryParam to /start REST endpoint | Possible Values   |
 |---------------------|----------------------------------|--------------------------------------------------------|
-| **Publish Key**     | The API Key used for publishing. | publishkey                         | String            |
-| **Subscribe Key**   | The API Key used for subscribing.| subscribekey                       | String            |
+| **Publish key**     | The API Key used for publishing. | publishkey                         | String            |
+| **Subscribe key**   | The API Key used for subscribing.| subscribekey                       | String            |
 
 ### Data endpoint
-| Item                       | Meaning                                                                                                                                                                                                                                                                                      | Environment variable     |
-|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| **Transcript destination** | The destination where transcribed data should be submitted. If using the `http` sendmechanism this destination will be URL where data can be sent with HTTP POST method. If using the `pubnub` sendmechanism this destination will be the pubnub channel where the transcripts will be sent. | `TRANSCRIPT_DESTINATION` |
+| Item                       | Meaning                                                                                                                                                                                                                                                                                    | Environment variable     |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| **Transcript destination** | The destination where transcribed data should be submitted. When using the `http` sendmechanism this destination is the URL where data can be sent with HTTP POST method. When using the `pubnub` sendmechanism this destination is the PubNub channel where the transcripts will be sent. | `TRANSCRIPT_DESTINATION` |
 
 ## Application-specific configurations
 
@@ -67,9 +67,9 @@ To use the AWS service, such as AWS Transcribe, the RTME runtime must have appro
 - `export AWS_ACCESS_KEY_ID=...`, `export AWS_SECRET_ACCESS_KEY=...`, and ` export AWS_SESSION_TOKEN=...`
 
 | Item                       | Meaning                                                                                                                                                                                                           | Environment variable     |
-|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| **AWS profile**            | The name of the AWS Command Line Interface (CLI) profile with the credentials and options to use.                                                                                                                 | `AWS_PROFILE`            |
-| **AWS access key**         | A unique identifier associated with an AWS Identity and Access Management (IAM) user or role. It is a part of the security credentials for authenticating your applications and services with AWS.                | `AWS_ACCESS_KEY_ID`      |
-| **AWS secret access key**  | The password paired with the access key that securely signs requests to AWS. It must be kept confidential to protect your resources.                                                                              | `AWS_SECRET_ACCESS_KEY`  |
-| **AWS session token**      | A temporary token used along with the access key and secret key in AWS when multi-factor authentication (MFA) is enabled or when roles are assumed. This helps to ensure the security and integrity of your data. | `AWS_SESSION_TOKEN`      |
+|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| **AWS profile**            | The name of the AWS Command Line Interface (CLI) profile with the credentials and options to use.                                                                                                                 | `AWS_PROFILE`           |
+| **AWS access key**         | A unique identifier associated with an AWS Identity and Access Management (IAM) user or role. It is a part of the security credentials for authenticating your applications and services with AWS.                | `AWS_ACCESS_KEY_ID`     |
+| **AWS secret access key**  | The password paired with the access key that securely signs requests to AWS. It must be kept confidential to protect your resources.                                                                              | `AWS_SECRET_ACCESS_KEY` |
+| **AWS session token**      | A temporary token used along with the access key and secret key in AWS when multi-factor authentication (MFA) is enabled or when roles are assumed. This helps to ensure the security and integrity of your data. | `AWS_SESSION_TOKEN`     |
 
