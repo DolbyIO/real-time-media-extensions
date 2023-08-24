@@ -1,8 +1,15 @@
 name: Build on Ubuntu
-on: pull_request
-    
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:  
+    tags:
+      - '*'
+ 
 jobs:
-  build:
+  build-resources:
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository code
@@ -25,3 +32,42 @@ jobs:
       - name: Build RTME c++/golang
         run: |
           bash setup/internal/linux.sh 
+       
+      - name: Prepare docker resources for upload
+        if: false 
+        run: |
+          zip -r docker-resource.zip build_docker_dir/
+
+      - name: Upload docker resources
+        if: false
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-resource
+          path: docker-resource.zip
+          retention-days: 1
+ 
+  build-docker:
+    runs-on: ubuntu-20.04
+    if: false 
+    needs: build-resources
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Build docker image
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+          sudo bash setup/internal/linux.sh --build_docker ${GITHUB_REF_NAME} --skip_building
+          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz        
+  
+      - name: Upload docker resources
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-rtme-image
+          path: dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
+          retention-days: 7

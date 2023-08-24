@@ -6,7 +6,7 @@ set -x
 WORK_DIR=$(pwd)
 
 source setup/awssdk.sh
-source setup/transcription.sh
+source setup/docker.sh
 
 function logi() {
   local msg=$1

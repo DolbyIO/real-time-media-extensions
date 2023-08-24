@@ -7,7 +7,7 @@ WORK_DIR=$(pwd)
 
 source setup/internal/dolbyiosdk_internal.sh
 source setup/awssdk.sh
-source setup/transcription.sh
+source setup/docker.sh
 
 function show_help() {
 	echo " Usage:"
@@ -17,7 +17,8 @@ function show_help() {
 	echo "      bash setup/linux.sh"
 	echo
 	echo " --sdk_version      	The commit hash of the package you want to fetch. If not set the top level hash of your current branch will be used."
-	echo " --build_docker       Build the docker image."
+	echo " --build_docker       Build the docker image with the specified tag for the image. The image will be dolby/rtme-TAG."
+	echo " --skip_building     	Skip building the dependencies, c++ plugin and golang binary. This should be used if docker resources exist."
 	echo " -h|--help          	Print this help."
 }
 
@@ -53,7 +54,12 @@ while [[ $# -gt 0 ]]; do
 			shift
 			;;
 		--build_docker)
-			build_docker=1
+			docker_tag="$2"
+			shift
+			shift
+			;;
+		--skip_building)
+			skip_building=1
 			shift
 			;;
 		-h|--help)
@@ -66,35 +72,38 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Get the version of the SDK to be used
-if [ -z ${sdk_version} ]; then
-	sdk_version=$(cat "${WORK_DIR}/setup/sdk_version.txt")
+# If specified skip the building of resources
+if [[ -z ${skip_building} ]]; then
+	# Get the version of the SDK to be used
+	if [ -z ${sdk_version} ]; then
+		sdk_version=$(cat "${WORK_DIR}/setup/sdk_version.txt")
+	fi
+	logi "SDK package of the following commit: ${sdk_version} will be used."
+
+	# Fetch SDK package if hashes do not match
+	if should_fetch_new_sdk; then
+		# Fetch the sdk-package and unzip it 
+		fetch_sdk
+		unzip_sdk_package
+	else
+		logi "Not fetching new SDK packages as hashes match"
+	fi
+
+	if aws_sdk_is_present; then
+		logi "AWS transcribe package is already present!"
+	else
+		logi "Clonging and compiling AWS SDK package!"
+		clone_compile_aws_sdk
+	fi 
+
+	# Build the transcription application anre preare the
+	# docker image.
+	build_cpp_transcription
+	prepare_docker_image
 fi
-logi "SDK package of the following commit: ${sdk_version} will be used."
-
-# Fetch SDK package if hashes do not match
-if should_fetch_new_sdk; then
-	# Fetch the sdk-package and unzip it 
-	fetch_sdk
-	unzip_sdk_package
-else
-	logi "Not fetching new SDK packages as hashes match"
-fi
-
-if aws_sdk_is_present; then
-	logi "AWS transcribe package is already present!"
-else
-	logi "Clonging and compiling AWS SDK package!"
-	clone_compile_aws_sdk
-fi 
-
-# Build the transcription application anre preare the
-# docker image.
-build_cpp_transcription
-prepare_docker_image
 
 # Build the docker image only if specified.
-if [[ $build_docker == 1 ]]; then
+if [[ ! -z ${docker_tag} ]]; then
 	echo "Building docker image"
-	build_docker_image
+	build_docker_image ${docker_tag}
 fi
