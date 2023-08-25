@@ -1,0 +1,8 @@
+build/
+build_dir/
+build_docker_dir/
+*tar.gz
+install_dir/
+ext-lib/
+CMakeLists.txt.user
+

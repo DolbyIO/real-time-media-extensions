@@ -1,0 +1,99 @@
+name: Build RTME 
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:  
+    tags:
+      - '*'
+ 
+jobs:
+  build-resources:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get --quiet update
+          sudo apt-get --quiet install python3-pkg-resources python3-pip ninja-build libcurl4-openssl-dev libssl-dev libpulse-dev
+          sudo apt purge cmake
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+          export DEBIAN_FRONTEND=noninteractive
+          sudo -E apt-get --quiet update --yes && sudo -E apt-get --quiet install --yes cmake
+
+      - name: Install golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.2'
+
+      - name: Build RTME c++/golang
+        run: |
+          bash setup/internal/linux.sh 
+       
+      - name: Prepare docker resources for upload
+        if: github.ref_type == 'tag'
+        run: |
+          zip -r docker-resource.zip build_docker_dir/
+
+      - name: Upload docker resources
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-resource
+          path: docker-resource.zip
+          retention-days: 1
+ 
+  build-docker:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-resources
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Build docker image
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+          sudo bash setup/internal/linux.sh --build_docker ${GITHUB_REF_NAME} --skip_building
+          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz        
+  
+      - name: Upload docker resources
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-rtme-image
+          path: dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
+          retention-days: 7
+
+  publish-docker:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-docker
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-rtme-image
