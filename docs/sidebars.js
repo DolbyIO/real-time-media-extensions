@@ -24,11 +24,23 @@ module.exports = {
       label: 'Installing and Executing',
       link: {
         type: 'generated-index',
-        description: 'You can install and run Real-time Media Extensions in two ways; you can either use a Linux executable or a Docker container.'
+        description: 'You can install and run Real-time Media Extensions in two ways; you can either build it and run it on Linux or use a Docker container.'
       },
       items: [
         'Installing and executing/docker-container',
-        'Installing and executing/linux-executable'
+        {
+          type: 'category',
+          label: 'Linux',
+          link: {
+            type: 'generated-index',
+            description: 'Before running Real-time Media Extensions on Linux, build it or use the Linux executable.'
+          },
+          items: [
+            'Installing and executing/Linux/building',
+            'Installing and executing/Linux/modifying-components',
+            'Installing and executing/Linux/running-natively',
+          ],
+        },
       ],
     },
     {

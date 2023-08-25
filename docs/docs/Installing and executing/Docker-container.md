@@ -1,6 +1,6 @@
 ---
 sidebar_label: Docker container
-title: Install and run RTME as a Docker container
+title: Installing and running RTME as a Docker container
 id: docker-container
 ---
 

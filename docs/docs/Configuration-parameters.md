@@ -35,12 +35,13 @@ The following configuration parameters are essential for RTME applications. You 
 ## Mechanisms for sending RTME data
 RTME offers mechanisms for transferring data processed by the application outside of the docker container in real time. You can specify the preferred mechanism by providing the proper query parameter to the /start REST endpoint. When it is not specified, the RTME application stores data in a file.
 
-| Item                | Meaning                                                                                                      | QueryParam to /start REST endpoint | Possible Values   |
-|---------------------|--------------------------------------------------------------------------------------------------------------|------------------------------------|-------------------|
-| **Send Mechanism**  | The mechanism used to send data from outside the RTME application. Currently this can be `http` or `pubnub`. | sendmechanism                      | `http`, `pubnub`  |
+| Item               | Meaning                                                            | QueryParam to /start REST endpoint | Possible Values  |
+|--------------------|--------------------------------------------------------------------|------------------------------------|------------------|
+| **Send Mechanism** | The mechanism used to send data from outside the RTME application. | sendmechanism                      | `http`, `pubnub` |
 
 ### PubNub
 Using PubNub as the send mechanism requires PubNub credentials that you can access after [registering](https://admin.pubnub.com/#/register) a PubNub account.
+
 | Item                | Meaning                          | QueryParam to /start REST endpoint | Possible Values   |
 |---------------------|----------------------------------|--------------------------------------------------------|
 | **Publish key**     | The API Key used for publishing. | publishkey                         | String            |
@@ -66,10 +67,10 @@ To use the AWS service, such as AWS Transcribe, the RTME runtime must have appro
 - `aws sso login` and `export AWS_PROFILE` if you use a Linux executable
 - `export AWS_ACCESS_KEY_ID=...`, `export AWS_SECRET_ACCESS_KEY=...`, and ` export AWS_SESSION_TOKEN=...`
 
-| Item                       | Meaning                                                                                                                                                                                                           | Environment variable     |
-|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
-| **AWS profile**            | The name of the AWS Command Line Interface (CLI) profile with the credentials and options to use.                                                                                                                 | `AWS_PROFILE`           |
-| **AWS access key**         | A unique identifier associated with an AWS Identity and Access Management (IAM) user or role. It is a part of the security credentials for authenticating your applications and services with AWS.                | `AWS_ACCESS_KEY_ID`     |
-| **AWS secret access key**  | The password paired with the access key that securely signs requests to AWS. It must be kept confidential to protect your resources.                                                                              | `AWS_SECRET_ACCESS_KEY` |
-| **AWS session token**      | A temporary token used along with the access key and secret key in AWS when multi-factor authentication (MFA) is enabled or when roles are assumed. This helps to ensure the security and integrity of your data. | `AWS_SESSION_TOKEN`     |
+| Item                      | Meaning                                                                                                                                                                                                           | Environment variable    |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| **AWS profile**           | The name of the AWS Command Line Interface (CLI) profile with the credentials and options to use.                                                                                                                 | `AWS_PROFILE`           |
+| **AWS access key**        | A unique identifier associated with an AWS Identity and Access Management (IAM) user or role. It is a part of the security credentials for authenticating your applications and services with AWS.                | `AWS_ACCESS_KEY_ID`     |
+| **AWS secret access key** | The password paired with the access key that securely signs requests to AWS. It must be kept confidential to protect your resources.                                                                              | `AWS_SECRET_ACCESS_KEY` |
+| **AWS session token**     | A temporary token used along with the access key and secret key in AWS when multi-factor authentication (MFA) is enabled or when roles are assumed. This helps to ensure the security and integrity of your data. | `AWS_SESSION_TOKEN`     |
 
