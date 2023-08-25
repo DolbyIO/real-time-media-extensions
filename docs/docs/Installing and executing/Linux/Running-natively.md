@@ -9,7 +9,7 @@ Before running RTME, build it or download the RTME Linux executable from [GitHub
 ## Run RTME directly from build or build_docker_dir
 
 You can directly launch the RTME runtime from the Linux command line interface. The application requires providing command line
-parameters and application-specific configurations described in the [Configuration Parameters](../Configuration-parameters.md) document.
+parameters and application-specific configurations described in the [Configuration Parameters](../../Configuration-parameters.md) document.
 
 The RTME project provides the `libdolbyio_comms_transcription.so` plugin. Locate
 it in the build directory and run the `desktop_app` using command line arguments, as in the following example:
