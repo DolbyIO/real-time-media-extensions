@@ -11,5 +11,5 @@ The application does not support any form of token refresh. We recommend using t
 
 For transcription, our application supports [AWS Transcribe](https://aws.amazon.com/transcribe/) and [Gladia.io](https://www.gladia.io/) services. The following guides explain how to configure the RTME runtime to connect to the preferred service:
 
-- [AWS Transcribe](./Live%20Transcription/Aws-transcribe.md)
-- [Gladia.io](./Live%20Transcription/Gladia-io.md)
+- [AWS Transcribe](Live%20Transcription/aws-transcribe.md)
+- [Gladia.io](Live%20Transcription/gladia-io.md)
