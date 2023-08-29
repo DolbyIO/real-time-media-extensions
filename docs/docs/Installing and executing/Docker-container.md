@@ -41,3 +41,17 @@ the following REST API endpoints on port 8080 for controlling its tasks. These e
 | `/terminate` | Terminates the RTME docker runtime.                                                                                                                                                                                                                                                                                   |
 | `/start`     | Sends a command with query parameters to the RTME docker runtime to start the application. See the [Configuration](../Configuration-parameters.md) section for more information.                                                                                                                                         |
 | `/stop`      | Stops the current RTME application.                                                                                                                                                                                                                                                                                   |
+## CA Certificates
+
+The docker image uses the standard CA certificates that come with the base Ubuntu 20.04 image. If you need different certificates you can update the certificates in the image as follows:
+
+- Add the following to the Dockerfile and rebuild the image
+```
+ADD YOUR-CA-CERTIFICATES.crt /usr/local/share/ca-certificates/additional-ca.crt
+RUN chmod 644 /usr/local/share/ca-certificates/additional-ca.crt && update-ca-certificates
+```
+
+- Run the docker image providing the newly updated certificates (these certificates will be used for this run)
+```
+docker run -p 8080:8080 -v update-ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -d dolbyio/rtme
+```
