@@ -8,50 +8,9 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
 	set(LINUX TRUE)
 endif()
 
-# Macro for stripping library from debug symbols and moving them to a separate file
-macro(dump_debug_symbols_and_strip __target)
-if(LINUX OR ANDROID)
-	add_custom_command(TARGET ${__target} POST_BUILD
-		COMMAND ${CMAKE_OBJCOPY} --only-keep-debug $<TARGET_FILE:${__target}> $<TARGET_FILE:${__target}>.debug
-		COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${__target}>
-		COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=$<TARGET_FILE:${__target}>.debug $<TARGET_FILE:${__target}>
-		COMMENT "Striping ${__target} and generating debug symbols"
-	)
-elseif(MACOS)
-	if(NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
-		# XCode will generate dsyms by its configuration; ninja generator must strip manually:
-		add_custom_command(TARGET ${__target} POST_BUILD
-			COMMAND dsymutil $<TARGET_FILE:${__target}> -o $<TARGET_FILE:${__target}>.dSYM
-			COMMAND ${CMAKE_STRIP} -S $<TARGET_FILE:${__target}>
-			COMMENT "Striping ${__target} and generating debug symbols"
-		)
-	endif()
-endif()
-endmacro()
-
-function(install_debuginfo __target __destination)
-	if(WINDOWS)
-		install(
-			FILES $<TARGET_PDB_FILE:${__target}>
-			DESTINATION ${__destination}
-		)
-	else(WINDOWS)
-		if(LINUX OR ANDROID)
-			set(DEBUG_SYMBOLS_EXTENSION "debug")
-		elseif(MACOS)
-			set(DEBUG_SYMBOLS_EXTENSION "dSYM")
-		endif()
-		install(
-			FILES $<TARGET_FILE:${__target}>.${DEBUG_SYMBOLS_EXTENSION}
-			DESTINATION ${__destination}
-		)
-	endif(WINDOWS)
-endfunction()
-
 if(LINUX)
 	set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif(LINUX)
-
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -60,6 +19,7 @@ project(dolbyio-realtime-media-extensions
 	VERSION 1.0.0
 )
 
+include(cmake/macros.cmake)
 include(cmake/awstranscribe.cmake)
 
 find_package(Threads REQUIRED)
@@ -77,6 +37,20 @@ find_package(DolbyioComms REQUIRED
 
 add_subdirectory(src)
 
-set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_SOURCE_IGNORE_FILES ".git;CMakeLists.txt.user;ext-lib;setup/linux.sh;setup/internal;install_dir;build_dir;build_docker_dir")
-include(CPack)
+find_program(GO_EXEC go REQUIRED
+	PATHS /usr/local/go/bin/
+)
+include(ExternalProject)
+ExternalProject_Add(rtme_golang_service
+	SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/
+	DOWNLOAD_COMMAND ""
+	INSTALL_COMMAND ""
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ${GO_EXEC} build -o rtme_service .
+	COMMAND mv rtme_service ${CMAKE_CURRENT_BINARY_DIR}
+	BUILD_IN_SOURCE True
+	BUILD_BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/rtme_service"
+	BUILD_ALWAYS True
+)
+
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rtme_service DESTINATION bin)

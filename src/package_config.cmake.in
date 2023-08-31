@@ -1,6 +1,0 @@
-@PACKAGE_INIT@
-
-include("${CMAKE_CURRENT_LIST_DIR}/@DOLBYIO_COMMS_CMAKE_PKG_NAME@.cmake")
-
-check_required_components(@DOLBYIO_COMMS_CMAKE_PKG_NAME@)
-

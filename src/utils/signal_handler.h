@@ -7,7 +7,7 @@
 #include <semaphore.h>
 #include <signal.h>
 
-namespace dolbyio::comms::transcription {
+namespace dolbyio::comms::rtme {
 
 class signal_handling_helper {
   inline static signal_handling_helper* g_instance = nullptr;

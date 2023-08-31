@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-namespace dolbyio::comms::transcription {
+namespace dolbyio::comms::rtme {
 
 signal_handling_helper::signal_handling_helper(
     sample::commands_handler_interface* hdl)
@@ -87,4 +87,4 @@ void signal_handling_helper::thread_function() {
   }
 }
 
-}  // namespace dolbyio::comms::transcription
+}  // namespace dolbyio::comms::rtme

@@ -1,4 +1,4 @@
-module github.com/DolbyIO/real-time-media-extensions 
+module github.com/DolbyIO/real-time-media-extensions
 
 go 1.20
 
