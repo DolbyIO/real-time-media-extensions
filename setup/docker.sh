@@ -1,6 +1,6 @@
 install_dir=${WORK_DIR}/install_dir
 
-build_cpp_transcription() {
+build_cpp_rtme() {
 	build_dir=${WORK_DIR}/build_dir
 	if [ ! -d ${build_dir} ]; then
 		mkdir -p ${build_dir}
@@ -10,7 +10,6 @@ build_cpp_transcription() {
 	cmake -GNinja ../ -DCMAKE_BUILD_TYPE=RelWithDebInfo
 	cmake --build .
 	cmake --install . --prefix ${install_dir}
-	cpack --config CPackSourceConfig.cmake
 	popd
 }
 

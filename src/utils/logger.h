@@ -1,10 +1,25 @@
 #pragma once
 
-#include "interfaces/logger.h"
+#include <dolbyio/comms/logger_sink.h>
 
+#include <memory>
 #include <sstream>
 
-namespace dolbyio::comms::transcription {
+namespace dolbyio::comms::rtme {
+class logger {
+ public:
+  virtual ~logger();
+
+  virtual bool is_enabled(log_level level) const = 0;
+  virtual log_level get_level() const = 0;
+  virtual void set_level(log_level level) = 0;
+  virtual void log(log_level level, std::string_view message) const = 0;
+
+  // Reimplement this method to create custom logger implementation:
+  static std::shared_ptr<logger> make(
+      const std::shared_ptr<logger_sink>& sdk_logger);
+};
+
 class sdk_logger {
  public:
   sdk_logger(log_level level, logger& logger)
@@ -38,10 +53,10 @@ class sdk_logger {
   bool enabled_;
   std::stringstream message_;
 };
-}  // namespace dolbyio::comms::transcription
+}  // namespace dolbyio::comms::rtme
 
 #define SDK_LOG(level)                                                     \
-  ::dolbyio::comms::transcription::sdk_logger(                             \
+  ::dolbyio::comms::rtme::sdk_logger(                             \
       dolbyio::comms::log_level::level,                                    \
-      ::dolbyio::comms::transcription::sdk_logger::logger_ref_from_member( \
+      ::dolbyio::comms::rtme::sdk_logger::logger_ref_from_member( \
           logger_))
