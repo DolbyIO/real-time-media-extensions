@@ -30,9 +30,9 @@ jobs:
       - name: Install golang
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20.2'
+          go-version: '1.20.7'
 
-      - name: Build RTME c++/golang
+      - name: Build RTME resources 
         run: |
           bash setup/linux.sh 
        
@@ -57,30 +57,33 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Prepare docker sources
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Download docker resources
-        uses: actions/download-artifact@v3
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          name: docker-resource
+          images: ${{ env.DOCKER_HUB_REPO }}
+          tags: ${GITHUB_REF_NAME}
 
-      - name: Build docker image
-        run: |
-          unzip docker-resource.zip && rm docker-resource.zip
-          sudo bash setup/linux.sh --build_docker ${GITHUB_REF_NAME} --skip_building
-          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz        
-
-      - name: Publish docker image
-        run: |
-          sudo docker push ${{ env.DOCKER_HUB_REPO }}:${GITHUB_REF_NAME}
-  
-      - name: Upload docker package
-        uses: actions/upload-artifact@v3
+      - name: Build and publish docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
-          name: docker-rtme-image
-          path: dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
-          retention-days: 7
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags:  ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

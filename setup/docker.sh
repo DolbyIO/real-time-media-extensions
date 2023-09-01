@@ -29,10 +29,11 @@ prepare_docker_image() {
 }
 
 build_docker_image() {
-		docker_tag=${1}
+		docker_repo=${1}
+		docker_tag=${2}
     pushd ${WORK_DIR}
-    docker build -t dolbyio/rtme:${docker_tag} -f Dockerfile --no-cache .
-    docker save --output dolbyio_rtme-${docker_tag}.tar dolbyio/rtme:${docker_tag}
+    docker build -t ${docker_repo}:${docker_tag} -f Dockerfile --no-cache .
+    docker save --output dolbyio_rtme-${docker_tag}.tar ${docker_repo}:${docker_tag}
     gzip -9 dolbyio_rtme-${docker_tag}.tar
     popd
 }
