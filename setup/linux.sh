@@ -17,7 +17,7 @@ function show_help() {
 	echo "      bash setup/linux.sh"
 	echo
 	echo " --dolby_sdk_version  The commit hash of the Dolby.io package you want to fetch. If not set the version in the sdks/version_dolbyio.txt will be used.."
-	echo " --build_docker       Build the docker image with the specified tag for the image. The image will be dolby/rtme-TAG."
+	echo " --build_docker       Build the docker image with the specified tag and name for the image. The image will be dolby/rtme-TAG."
 	echo " --skip_building     	Skip building the dependencies, c++ plugin and golang binary. This should be used if docker resources exist."
 	echo " -h|--help          	Print this help."
 }
@@ -54,7 +54,9 @@ while [[ $# -gt 0 ]]; do
 			shift
 			;;
 		--build_docker)
-			docker_tag="$2"
+			docker_repo="$2"
+			docker_tag="$3"
+			shift
 			shift
 			shift
 			;;
@@ -103,7 +105,7 @@ if [[ -z ${skip_building} ]]; then
 fi
 
 # Build the docker image only if specified.
-if [[ ! -z ${docker_tag} ]]; then
+if [[ ! -z ${docker_repo} ]]; then
 	echo "Building docker image"
-	build_docker_image ${docker_tag}
+	build_docker_image ${docker_repo} ${docker_tag}
 fi
