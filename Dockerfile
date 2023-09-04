@@ -17,6 +17,6 @@ RUN apt-get --quiet update --yes \
   && apt-get --quiet dist-upgrade --yes \
   && apt-get --quiet install --yes --fix-missing -o 'Acquire::Retries=40' curl libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libxtst6 libcurl4 \
   && rm -rf /var/lib/apt/lists/*
-COPY build_docker_dir/docker/resources /opt/transcription/
+COPY build_docker_dir/docker/resources /opt/rtme/
 
-ENTRYPOINT ["/opt/transcription/bin/transcription"]
+ENTRYPOINT ["/opt/rtme/bin/rtme_service"]

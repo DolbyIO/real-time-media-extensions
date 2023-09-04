@@ -48,7 +48,7 @@ func GetEnvOrDefault(env string, def string) string {
 }
 
 var (
-  BinaryLocation = GetEnvOrDefault("BINARY_LOCATION", "/opt/transcription/")
+  BinaryLocation = GetEnvOrDefault("BINARY_LOCATION", "/opt/rtme/")
   TranscriptDestination = GetEnvOrDefault("TRANSCRIPT_DESTINATION", "")
 )
 
@@ -196,7 +196,7 @@ func StartHandler(c echo.Context) error {
                     "-u", user,
                     "-k", token,
                     "-m", "NONE",
-                    "-l", "5",
+                    "-l", "3",
                     "--noninteractive",
                     transcript_transfer_method, transcript_file,
                     "--rtme-transcription-logging-level", "3",
