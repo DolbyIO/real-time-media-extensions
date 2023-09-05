@@ -62,14 +62,14 @@ are:
 Use the `/stop` or `/terminate` endpoint to terminate the application or 
 stop transcribing.
 
-For more information, see the RTME [documentation](https://api-references.dolby.io/real-time-media-extensions/docs/docker-container).
+For more information, see the RTME [documentation](https://api-references.dolby.io/real-time-media-extensions/docs/Installing%20and%20executing/docker-container).
 
 <a name="buildplugin"/>
 
 ## Building
-If you would like to build the sources from scratch and/or modify the components, see the [Building](https://api-references.dolby.io/real-time-media-extensions/docs/Linux/building) and [Modifying Components](https://api-references.dolby.io/real-time-media-extensions/docs/Linux/modifying-components) instructions.
+If you would like to build the sources from scratch and/or modify the components, see the [Building](https://api-references.dolby.io/real-time-media-extensions/docs/Installing%20and%20executing/Linux/building) and [Modifying Components](https://api-references.dolby.io/real-time-media-extensions/docs/Installing%20and%20executing/Linux/modifying-components) instructions.
 
 <a name="runningnatively"/>
 
 ## Running natively
-If you would like to run the application natively on Ubuntu 20.04, refer to the [instruction](https://api-references.dolby.io/real-time-media-extensions/docs/Linux/running-natively).
+If you would like to run the application natively on Ubuntu 20.04, refer to the [instruction](https://api-references.dolby.io/real-time-media-extensions/docs/Installing%20and%20executing/Linux/running-natively).
