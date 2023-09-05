@@ -6,19 +6,19 @@ id: docker-container
 
 [Docker](https://www.docker.com/whatisdocker) is a tool that can package an application and its dependencies in a virtual container to run on different host operating systems.
 
-## Get RTME from Dockerhub
+## Get RTME from GitHub Container Registry 
 
 To pull the latest version of RTME, use the following command:
 
 ```shell
-$ docker pull dolbyio/rtme
+$ docker pull ghcr.io/dolbyio/real-time-media-extensions:latest
 ```
 
 You can also pull a specific version, for example, v0.1.1. The full list of versions is available on
-[Dockerhub](https://hub.docker.com/r/dolbyio/rtme/tags/).
+[GitHub Container Registry](https://github.com/dolbyio/real-time-media-extensions/pkgs/container/real-time-media-extensions).
 
 ```shell
-$ docker pull dolbyio/rtme:release-v0.1.1
+$ docker pull ghcr.io/dolbyio/real-time-media-extensions:1.0.0
 ```
 
 ## Run the container
