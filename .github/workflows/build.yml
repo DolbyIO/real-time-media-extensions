@@ -1,7 +1,8 @@
 name: Build RTME 
 
 env:
-  DOCKER_HUB_REPO: "dolbyio/real-time-media-extensions"
+  GHCR: "ghcr.io"
+  DOCKER_IMAGE_NAME: "dolbyio/real-time-media-extensions" 
 
 on:
   pull_request:
@@ -49,8 +50,76 @@ jobs:
           path: docker-resource.zip
           retention-days: 1
 
+  # Add the docker image to the release
+  docker-release-artifact:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-resources
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Build, save and release docker
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+          sudo bash setup/linux.sh --build_docker ${{ env.DOCKER_IMAGE_NAME }} ${GITHUB_REF_NAME} --skip_building
+          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
+          gh release upload ${GITHUB_REF_NAME} dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
+
+  docker-ghcr-publish:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-resources
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Prepare docker sources
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          registry: ${{ env.GHCR }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.GHCR  }}/${{ env.DOCKER_IMAGE_NAME }}
+          tags: ${{ github.ref_name }}
+
+      - name: Build and publish docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags:  ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+    
   # Disable this job for now until repo is set
-  build-deploy-docker:
+  docker-hub-publish:
     if: false 
     runs-on: ubuntu-20.04
     needs: build-resources
@@ -77,7 +146,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.DOCKER_HUB_REPO }}
+          images: ${{ env.DOCKER_IMAGE_NAME }}
           tags: ${GITHUB_REF_NAME}
 
       - name: Build and publish docker image
@@ -88,28 +157,3 @@ jobs:
           push: true
           tags:  ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  build-save-docker:
-    if: github.ref_type == 'tag'
-    runs-on: ubuntu-20.04
-    needs: build-resources
-    permissions:
-      contents: write
-      packages: write
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-
-      - name: Download docker resources
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-resource
-
-      - name: Build, save and release docker
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          unzip docker-resource.zip && rm docker-resource.zip
-          sudo bash setup/linux.sh --build_docker ${{ env.DOCKER_HUB_REPO }} ${GITHUB_REF_NAME} --skip_building
-          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
-          gh release upload ${GITHUB_REF_NAME} dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
