@@ -1,7 +1,7 @@
 name: Build RTME 
 
 env:
-  DOCKER_HUB_REPO: "voxeet/real-time-media-extensions"
+  DOCKER_HUB_REPO: "dolbyio/real-time-media-extensions"
 
 on:
   pull_request:
@@ -48,9 +48,10 @@ jobs:
           name: docker-resource
           path: docker-resource.zip
           retention-days: 1
- 
+
+  # Disable this job for now until repo is set
   build-deploy-docker:
-    if: github.ref_type == 'tag'
+    if: false 
     runs-on: ubuntu-20.04
     needs: build-resources
     steps:
@@ -87,3 +88,28 @@ jobs:
           push: true
           tags:  ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-save-docker:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-20.04
+    needs: build-resources
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Download docker resources
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-resource
+
+      - name: Build, save and release docker
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          unzip docker-resource.zip && rm docker-resource.zip
+          sudo bash setup/linux.sh --build_docker ${{ env.DOCKER_HUB_REPO }} ${GITHUB_REF_NAME} --skip_building
+          sudo chmod 777 dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
+          gh release upload ${GITHUB_REF_NAME} dolbyio_rtme-${GITHUB_REF_NAME}.tar.gz
