@@ -1,3 +1,5 @@
+# :warning: This repository is no longer maintained :warning:
+
 [![Build Realtime Media Extensions](https://github.com/DolbyIO/real-time-media-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/DolbyIO/real-time-media-extensions/actions/workflows/build.yml)
 [![Documentation](https://github.com/DolbyIO/real-time-media-extensions/actions/workflows/deploy-to-github-pages.yml/badge.svg)](https://github.com/DolbyIO/real-time-media-extensions/actions/workflows/deploy-to-github-pages.yml)
 [![License](https://img.shields.io/github/license/DolbyIO/real-time-media-extensions)](LICENSE)
