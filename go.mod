@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/labstack/echo/v4 v4.11.1
-	github.com/pubnub/go/v7 v7.1.2
+	github.com/pubnub/go/v7 v7.2.0
 )
 
 require (
